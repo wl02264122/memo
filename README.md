@@ -1,1 +1,2 @@
-若需查看顯示效果或是JS輸出結果要開啟index網頁
+This is chinese memo
+此為中文備忘錄
