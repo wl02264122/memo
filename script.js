@@ -387,7 +387,7 @@ const database = getDatabase(app);
 const usersRef = ref(database, 'users' + username); // 資料庫路徑
 
 // create 新增資料進資料庫
-try{
+try {
     const getEmail = document.querySelector("#email").value;
     const getUsername = document.querySelector("#getUsername").value;
     const getPassword = document.querySelector("#getPassword").value;
@@ -407,7 +407,8 @@ try{
             alert("Error:" + error)
         })
 
-    }catch{
+} catch {
+    console.log(error);
 }
 
 // read 獲取資料庫資料
@@ -417,14 +418,14 @@ const getUsername = document.querySelector("#getUsername").value;
 const getPassword = document.querySelector("#getPassword").value;
 const refCount = ref(database, "users/" + username);
 const userRef = ref(database, "users/" + username);
-onValue(refCount, (snapshot)=> { // snapshot 資料庫快照
+onValue(refCount, (snapshot) => { // snapshot 資料庫快照
     const data = snapshot.val();
     console.log(data.username);
     console.log(data.password);
     console.log(data.email);
 })
 // 獲取一次資料庫資料，而不是持續監聽
-get(userRef).then((snapshot)=> {
+get(userRef).then((snapshot) => {
     const data = snapshot.val();
     console.log(data.username);
     console.log(data.password);
@@ -437,12 +438,69 @@ getPassword = document.querySelector("#password").value;
 getEmail = document.querySelector("#email").value;
 
 update(userRef, {
-    username : getUsername,
-    password : getPassword,
-    email : getEmail
+    username: getUsername,
+    password: getPassword,
+    email: getEmail
 })
 
 // delete 刪除資料庫內的資料
-remove(userRef + password) //刪除密碼
-remove(userRef + email) //刪除信箱
-remove(userRef + username) //刪除用戶名
+remove(userRef + password); //刪除密碼
+remove(userRef + email); //刪除信箱
+remove(userRef + username); //刪除用戶名
+
+// -----------------------------------------------------
+// --------------firebase authentication----------------
+// -----------------------------------------------------
+
+// 初始化
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getAuth, connectAuthEmulator, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+const authApp = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 創建憑證帳戶 createUserWithEmailAndPassword
+const authCreateSubmit = document.querySelector("#auth-create-submit");
+
+function createAuthUsers() {
+    authCreateSubmit.addEventListener("click", (event) => {
+        try {
+            const email = document.querySelector("#auth-get-email")
+            const password = document.querySelector("#auth-get-password")
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential;
+                    alert("創建帳戶中!");
+                })
+                .catch((error) => {
+                    alert("發生未知錯誤");
+                    console.log(error.code + error.message);
+                })
+        }
+        catch {
+        }
+    })
+}
+// 登陸憑證帳戶 signInWithEmailAndPassword
+const authLoginSubmit = document.querySelector("#auth-login-submit")
+function loginAuthUsers() {
+    authLoginSubmit.addEventListener((event) => {
+        try {
+            const email = document.querySelector("#auth-get-email")
+            const password = document.querySelector("#auth-get-password")
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential;
+                    alert("登陸帳號中");
+                    window.location.href = "memberPage.html";
+                })
+                .catch((error) => {
+                    alert("發生未知錯誤");
+                    console.log(error.code + error.message);
+
+                })
+        }
+        catch {
+        }
+    })
+}
